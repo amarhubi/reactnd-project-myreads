@@ -1,28 +1,11 @@
 import React from 'react'
 import BookShelf from './BookShelf'
 import { getAll, update } from './BooksAPI'
+import { Link } from 'react-router-dom'
 
 class BookShelves extends React.Component {
-
     state = {
-        books: [],
-        bookShelves: [
-            {
-                title: 'Currently Reading',
-                id: 'currentlyReading',
-                books: []
-            },
-            {
-                title: 'Want to Read',
-                id: 'wantToRead',
-                books: []
-            },
-            {
-                title: 'Read',
-                id: 'read',
-                books: []
-            }   
-        ],
+        // books: new Map(),
 
         currentlyReading:  {
             title: 'Currently Reading',
@@ -46,28 +29,21 @@ class BookShelves extends React.Component {
         update(book, newShelf).then(data => {            
             for(let entry of Object.entries(data)){
                 let [shelf, bookIds] = entry;
-                let newBooks = [];
-                bookIds.map(id => {
-                    let filteredBook = this.state.books.filter(book => book.id === id)
-                    newBooks.push(filteredBook[0])
-                    return null;
-                })
-                newState[shelf].books = newBooks 
+                newState[shelf].books = bookIds.map(id => this.props.books.get(id))
             }
-
             this.setState(newState);
         })
     }
 
     componentDidMount(){
+        // const currentlyReading = this.props.books.values().filter(book => book.shelf === 'currentlyReading')
         getAll().then(books => { 
-            console.log(books);
             const currentlyReading = books.filter(book => book.shelf === 'currentlyReading')
             const wantToRead = books.filter(book => book.shelf === 'wantToRead')
             const read = books.filter(book => book.shelf === 'read')
 
             this.setState((oldState) => ({
-                books: books,    
+                // books: books_map,    
                 currentlyReading: {
                     title: oldState.currentlyReading.title,
                     id: oldState.currentlyReading.id,
@@ -89,7 +65,7 @@ class BookShelves extends React.Component {
     }
 
     render(){
-        const { currentlyReading, read, wantToRead } = this.state;
+        const { shelves, books } = this.props
         
         return(
             <div className="list-books">
@@ -98,13 +74,13 @@ class BookShelves extends React.Component {
                 </div>
                 <div className="list-books-content">
                     <div>
-                        <BookShelf title={`Currently Reading`} books={currentlyReading.books} onShelfChange={this.onShelfChange}/>
-                        <BookShelf title={`Want to Read`} books={wantToRead.books} onShelfChange={this.onShelfChange}/>
-                        <BookShelf title={`Read`} books={read.books} onShelfChange={this.onShelfChange}/>
+                        <BookShelf key={`currentlyReading`} title={`Currently Reading`} books={shelves.currentlyReading.map(bookId => books.get(bookId))} onShelfChange={this.onShelfChange}/>
+                        <BookShelf key={`wantToRead`} title={`Want to Read`} books={shelves.wantToRead.map(bookId => books.get(bookId))} onShelfChange={this.onShelfChange}/>
+                        <BookShelf key={`read`} title={`Read`} books={shelves.read.map(bookId => books.get(bookId))} onShelfChange={this.onShelfChange}/>
                     </div>
                 </div>
                 <div className="open-search">
-                <button onClick={() => this.setState({ showSearchPage: true })}>Add a book</button>
+                <Link to='/search'>Add a book</Link>
                 </div>
             </div>
         )
