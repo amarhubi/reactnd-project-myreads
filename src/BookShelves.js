@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom'
 
 class BookShelves extends React.Component {
     
-    
-
     render(){
         const { shelves, books, onShelfChange } = this.props
         
