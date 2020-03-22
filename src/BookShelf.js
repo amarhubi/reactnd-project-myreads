@@ -12,6 +12,7 @@ class BookShelf extends React.Component {
                         {books.map(book => ( 
                             <Book 
                                 key={book.id}
+                                book={book}
                                 id={book.id}
                                 title={book.title}
                                 authors={book.authors}

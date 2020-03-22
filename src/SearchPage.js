@@ -11,23 +11,25 @@ class SearchPage extends React.Component{
         results: []
     }
     handleChange = (e) => {
-        // console.log(e.target.value)
-        let search_string = e.target.value.trim()
-        search(search_string).then(data => {
-            console.log(this.props.books);
-            data.map(d => console.log(this.props.books.get(d.id)))
-            if(Array.isArray(data))
-                this.setState({results: data.filter(d => d.imageLinks), searchValue: search_string })
-            else
-                this.setState({results: []})
-        })
+        let search_string = e.target.value.trim();
+        console.log(search_string);
+        if(search_string.length === 0)
+            this.setState({results: []})
+
+        else {
+            search(search_string).then(data => {
+                if(Array.isArray(data))
+                    this.setState({results: data.filter(d => d.imageLinks), searchValue: search_string })
+                else
+                    this.setState({results: []})
+            
+            }).catch(e => console.log(e))
+        }
     }
     
     handleSubmit = (e) => {
         e.preventDefault();
-        console.log(`Search string: ${this.state.searchValue}`)
         search(this.state.searchValue).then(data => {
-            console.log(data)
             this.setState({results: data})
         })
     }
@@ -55,17 +57,16 @@ class SearchPage extends React.Component{
                 <div className="search-books-results">
                 <ol className="books-grid">
                     {this.state.results.length > 0 ? this.state.results.map(book => (
-                    <li>
                         <Book 
                                 key={book.id}
                                 id={book.id}
+                                book={book}
                                 title={book.title}
                                 authors={book.authors}
-                                shelf={book.shelf}
+                                shelf={this.props.books.get(book.id) && this.props.books.get(book.id).shelf}
                                 imageUrl={book.imageLinks.smallThumbnail}
                                 onShelfChange={this.props.onShelfChange}
                             />
-                    </li>
                     )) : 'No results'}
                 </ol>
                 </div>
